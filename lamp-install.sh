@@ -70,6 +70,15 @@ fi
 sudo apt-get update
 sudo apt-get install -y $PACKAGES $PHP_MODULES
 
+# Configure Apache2
+cp ./conf/000-default.conf.j2 /etc/apache2/sites-available/000-default.conf
+systemctl restart apache2
+
+cp ./conf/nginx-default.conf.j2 /etc/nginx/sites-available/default
+systemctl restart nginx
+
+exit 1
+
 
 # Check installed wordpress
 if [ -d "/var/www/html/wordpress" ]; then
