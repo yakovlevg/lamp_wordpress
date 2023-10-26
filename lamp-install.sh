@@ -72,6 +72,7 @@ sudo apt-get install -y $PACKAGES $PHP_MODULES
 
 # Configure Apache2
 cp ./conf/000-default.conf.j2 /etc/apache2/sites-available/000-default.conf
+sed -i 's/Listen 80/Listen 8080/g' /etc/apache2/ports.conf
 systemctl restart apache2
 
 cp ./conf/nginx-default.conf.j2 /etc/nginx/sites-available/default
