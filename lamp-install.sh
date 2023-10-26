@@ -9,6 +9,7 @@ DB_PASSWORD=$(date | md5sum | head -c 15)
 WP_USER="admin"
 WP_PASSWORD=$(sleep 1 && date | md5sum | head -c 15)
 HOST=$(hostname)
+LOCAL_IP=$(ip ro ls | grep -oP 'src \K[^ ]+')
 WWW_ROOT="/var/www/html"
 echo "Mysql creds:\n Username: $DB_USER\n Password: $DB_PASSWORD \n"
 MESSAGE="Mysql creds:\n Username: $DB_USER\n Password: $DB_PASSWORD \n"
@@ -36,14 +37,14 @@ service_check () {
 deploy_wp_site() {
     cd $WWW_ROOT
     # Download the latest version of WordPress
-    wp core download --path=$1
+    wp core download --allow-root --path=$1
     cd $WWW_ROOT/$1
     # Create a new wp-config.php file
-    wp config create --dbname=$DB_USER --dbuser=$DB_USER --prompt=$DB_PASSWORD
+    wp config create --dbname=$DB_USER --dbuser=$DB_USER --dbpass=$DB_PASSWORD --allow-root
     # Create the database based on wp-config.php
-    wp db create
+    # wp db create --allow-root
     # Install WordPress 
-    wp core install --url=$HOST --title="WP-CLI" --admin_user=$WP_USER --admin_password=$WP_PASSWORD --admin_email=info@wp-cli.org
+    wp core install --url=$LOCAL_IP --title=$HOST --admin_user=$WP_USER --admin_password=$WP_PASSWORD --admin_email=info@wp-cli.org --allow-root
 
 }
 
@@ -94,10 +95,10 @@ else
     echo "Please enter root user MySQL password!"
     echo "Note: password will be hidden when typing"
     read -sp rootpasswd
-    mysql -uroot -p${rootpasswd} -e "CREATE DATABASE ${DB_USER} /*\!40100 DEFAULT CHARACTER SET utf8 */;"
-    mysql -uroot -p${rootpasswd} -e "CREATE USER ${DB_USER}@localhost IDENTIFIED BY '${DB_PASSWORD}';"
-    mysql -uroot -p${rootpasswd} -e "GRANT ALL PRIVILEGES ON ${DB_USER}.* TO '${DB_USER}'@'localhost';"
-    mysql -uroot -p${rootpasswd} -e "FLUSH PRIVILEGES;"
+    mysql -uroot -p${rootpasswd} -e "CREATE DATABASE ${DB_USER} /*\!40100 DEFAULT CHARACTER SET utf8 */; \
+    CREATE USER ${DB_USER}@localhost IDENTIFIED BY '${DB_PASSWORD}'; \
+    GRANT ALL PRIVILEGES ON ${DB_USER}.* TO '${DB_USER}'@'localhost'; \
+    FLUSH PRIVILEGES;"
   fi
 fi
 
@@ -116,7 +117,8 @@ fi
 
 deploy_wp_site "$DB_USER"
 
-
+echo "Wordpress has been deployed on $HOST.\n Please visit http://$LOCAL_IP/wp-admin/ \n
+      Username: $WP_USER\nPassword: $WP_PASSWORD"
 
 
 
