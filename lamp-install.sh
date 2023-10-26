@@ -9,6 +9,7 @@ DB_PASSWORD=$(date | md5sum | head -c 15)
 WP_USER="admin"
 WP_PASSWORD=$(sleep 1 && date | md5sum | head -c 15)
 HOST=$(hostname)
+WWW_ROOT="/var/www/html"
 echo "Mysql creds:\n Username: $DB_USER\n Password: $DB_PASSWORD \n"
 MESSAGE="Mysql creds:\n Username: $DB_USER\n Password: $DB_PASSWORD \n"
 PHP_MODULES="php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip"
@@ -29,6 +30,21 @@ service_check () {
 	else
   		systemctl start "$service_name"
 	fi
+}
+
+
+deploy_wp_site() {
+    cd $WWW_ROOT
+    # Download the latest version of WordPress
+    wp core download --path=$1
+    cd $WWW_ROOT/$1
+    # Create a new wp-config.php file
+    wp config create --dbname=$DB_USER --dbuser=$DB_USER --prompt=$DB_PASSWORD
+    # Create the database based on wp-config.php
+    wp db create
+    # Install WordPress 
+    wp core install --url=$HOST --title="WP-CLI" --admin_user=$WP_USER --admin_password=$WP_PASSWORD --admin_email=info@wp-cli.org
+
 }
 
 is_installed() {
@@ -85,6 +101,20 @@ else
   fi
 fi
 
+
+## Install wp-cli
+
+if [ -f "/usr/local/bin/wp"]; then
+    echo "File wp exists."
+else
+    curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    chmod +x wp-cli.phar
+    sudo mv wp-cli.phar /usr/local/bin/wp
+fi 
+
+## Deploy Wordpress site
+
+deploy_wp_site "$DB_USER"
 
 
 
