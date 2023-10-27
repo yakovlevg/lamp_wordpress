@@ -9,6 +9,7 @@
     - "./group_vars/vars.yaml"
 
   tasks:
+
     - name: Install prerequisites
       apt: name=aptitude update_cache=yes state=latest force_apt_get=yes
       tags: [ system ]
@@ -122,13 +123,6 @@
           chdir: "/var/www/html/{{ domain_name }}/"
 #      when: wordpress_is_installed|failed
       remote_user: "{{ web_user }}"
-
-
-    - name: Set up wp-config
-      template:
-        src: "files/wp-config.php.j2"
-        dest: "/var/www/html/wordpress/wp-config.php"
-      tags: [ wordpress ]
 
     - name: Set up apache conf
       template:
