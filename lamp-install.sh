@@ -40,8 +40,11 @@ deploy_wp_site() {
     wp core download --allow-root --path=$1
     cd $WWW_ROOT/$1
     if [ -f "wp-config.php" ]; then
+       # Create backup file wp-config.php
+       cp ./wp-config.php ./wp-config.php.bak
        # Update Database password
        wp config set DB_PASSWORD $DB_PASSWORD --allow-root
+       exit 0
     fi
     # Create a new wp-config.php file
     wp config create --dbname=$DB_USER --dbuser=$DB_USER --dbpass=$DB_PASSWORD --allow-root
@@ -111,7 +114,7 @@ fi
 
 ## Install wp-cli
 
-if [ -f "/usr/local/bin/wp"]; then
+if [ -f "/usr/local/bin/wp" ]; then
     echo "File wp exists."
 else
     curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
@@ -123,9 +126,10 @@ fi
 
 # Check installed wordpress
 if [ -d "/var/www/html/wordpress" ]; then
-     echo "wordpress already installed";
+     echo "Wordpress already installed. Create backup config file and update Database password.";
+     deploy_wp_site "$DB_USER"
 else
-	echo "Wordpress is not installed"
+	echo "Wordpress is not installed. Start fresh install."
     deploy_wp_site "$DB_USER"
 	#exit 1
 fi
