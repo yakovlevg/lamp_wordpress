@@ -98,6 +98,7 @@
               --dbuser="{{ db_user }}"
               --dbpass="{{ db_pwd }}"
               --dbprefix="{{ db_prefix }}"
+              --allow-root
       remote_user: "{{ web_user }}"
       when: wp_dir.stat.isdir is not defined
 
@@ -116,6 +117,7 @@
                 --admin_user="{{ wp_admin_user }}"
                 --admin_password="{{ wp_admin_pwd }}"
                 --admin_email="{{ wp_admin_email }}"
+                --allow-root
       args:
           chdir: "/var/www/html/{{ domain_name }}/"
       when: wordpress_is_installed|failed
