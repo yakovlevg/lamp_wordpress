@@ -40,7 +40,7 @@
                   login_password="{{ mysql_root_password }}"
 
     - name: Is WordPress downloaded?
-      stat: path="/var/www/{{ domain_name }}/html/index.php"
+      stat: path="/var/www/html/{{ domain_name }}/index.php"
       register: wp_dir
 
     - name: Download WordPress
