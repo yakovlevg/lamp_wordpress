@@ -102,13 +102,13 @@
       remote_user: "{{ web_user }}"
       when: wp_dir.stat.isdir is not defined
 
-    - name: Is WordPress installed?
-      command: wp core is-installed --allow-root
-      args:
-        chdir: "/var/www/html/{{ domain_name }}/"
-      register: wordpress_is_installed
-      ignore_errors: True
-      remote_user: "{{ web_user }}"
+    # - name: Is WordPress installed?
+    #   command: wp core is-installed --allow-root
+    #   args:
+    #     chdir: "/var/www/html/{{ domain_name }}/"
+    #   register: wordpress_is_installed
+    #   ignore_errors: True
+    #   remote_user: "{{ web_user }}"
 
     - name: Install WordPress tables
       command: wp core install
@@ -120,7 +120,7 @@
                 --allow-root
       args:
           chdir: "/var/www/html/{{ domain_name }}/"
-      when: wordpress_is_installed|failed
+#      when: wordpress_is_installed|failed
       remote_user: "{{ web_user }}"
 
 
