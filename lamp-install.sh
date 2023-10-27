@@ -44,34 +44,19 @@ deploy_wp_site() {
        cp ./wp-config.php ./wp-config.php.bak
        # Update Database password
        wp config set DB_PASSWORD $DB_PASSWORD --allow-root
-       exit 0
+    else
+        # Create a new wp-config.php file
+        wp config create --dbname=$DB_USER --dbuser=$DB_USER --dbpass=$DB_PASSWORD --allow-root
+        # Install WordPress 
+        wp core install --url=$LOCAL_IP --title=$HOST --admin_user=$WP_USER --admin_password=$WP_PASSWORD --admin_email=info@wp-cli.org --allow-root
+     
     fi
-    # Create a new wp-config.php file
-    wp config create --dbname=$DB_USER --dbuser=$DB_USER --dbpass=$DB_PASSWORD --allow-root
-    # Create the database based on wp-config.php
-    # wp db create --allow-root
-    # Install WordPress 
-    wp core install --url=$LOCAL_IP --title=$HOST --admin_user=$WP_USER --admin_password=$WP_PASSWORD --admin_email=info@wp-cli.org --allow-root
-
 }
 
-is_installed() {
-	 [ -z "$(dpkg -l | awk "/^ii  $1/")" ]
-}
+############################################################################################################
+##########################   Start deployment LAMP with Wordpress    #######################################
+############################################################################################################
 
-
-#########################################################
-#######     Experemental block     ######################
-#########################################################
-if is_installed "apache"; then
-    echo "coreutils installed";
-else
-    echo "coreutils not installed";
-fi
-
-##########################################################
-#############       END Experiment       #################
-##########################################################
 
 # Install dependency packges
 sudo apt-get update
@@ -131,7 +116,6 @@ if [ -d "/var/www/html/wordpress" ]; then
 else
 	echo "Wordpress is not installed. Start fresh install."
     deploy_wp_site "$DB_USER"
-	#exit 1
 fi
 
 printf "Wordpress has been deployed on $HOST.\n Please visit http://$LOCAL_IP/wp-admin/ \n
