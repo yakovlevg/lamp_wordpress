@@ -42,4 +42,11 @@ chmod +x lamp-install.sh && ./lamp-install.sh
 wget -O - https://raw.githubusercontent.com/yakovlevg/vizor_tz/feature/task1/lamp-install.sh | bash
 
 ```
+### Важно
+Пароли для базы данных и админ панели меняются при каждом запуске скрипта!
+
+### ToDo
+ - запуск скрипта на любом Linux дистрибутиве
+ - Отправка уведомления об ошибке выполнения скрипта на любом из этапов установки.
+
 
