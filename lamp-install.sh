@@ -39,6 +39,7 @@ deploy_wp_site() {
     if [ -f "$WWW_ROOT/$1/wp-config.php" ]; then
        # Create backup file wp-config.php
        cp $WWW_ROOT/$1/wp-config.php $WWW_ROOT/$1/wp-config.php.bak
+       cd $WWW_ROOT/$1
        # Update Database password
        wp config set DB_PASSWORD $DB_PASSWORD --allow-root
     else
