@@ -2,7 +2,7 @@ ansible_become_method: sudo
 ansible_python_interpreter: /usr/bin/python3
 wp_site_title: "Welcome"
 db_prefix: "wp_"
-domain_name: "My wordpress"
+domain_name: "wordpress"
 wp_home_url: "localhost"
 root_bin: "/usr/local/bin"
 db_name: "wordpress"

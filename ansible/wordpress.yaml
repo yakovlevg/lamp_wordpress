@@ -70,6 +70,20 @@
       stat: path="/var/www/html/{{ domain_name }}/index.php"
       register: wp_dir
 
+    - name: Creates directory
+      file:
+        path: "/var/www/html/{{ domain_name }}"
+        state: directory
+
+    - name: Set ownership
+      file:
+        path: "/var/www/html/"
+        state: directory
+        recurse: yes
+        owner: www-data
+        group: www-data
+      tags: [ wordpress ]
+
     - name: Download WordPress
       command: wp core download
       args:
