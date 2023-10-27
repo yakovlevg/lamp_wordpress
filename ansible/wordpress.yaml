@@ -52,6 +52,7 @@
   # WordPress Configuration
     - name: Create WordPress database
       mysql_db: name="{{ db_name }}"
+                login_unix_socket="/var/run/mysqld/mysqld.sock"
                 state=present
                 login_user=root
                 login_password="{{ mysql_root_password }}"
@@ -63,6 +64,7 @@
                   state=present
                   login_user="root"
                   login_password="{{ mysql_root_password }}"
+                  login_unix_socket="/var/run/mysqld/mysqld.sock"
 
     - name: Is WordPress downloaded?
       stat: path="/var/www/html/{{ domain_name }}/index.php"
