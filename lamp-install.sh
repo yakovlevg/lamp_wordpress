@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -xe
+# set -xe
 ## Read sensityve data
 source ./.env
 
@@ -16,7 +16,6 @@ MESSAGE="Mysql creds:\n Username: $DB_USER\n Password: $DB_PASSWORD \n"
 PHP_MODULES="php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip"
 PACKAGES="apache2 default-mysql-server php libapache2-mod-php php-mysql nginx curl sendemail libnet-ssleay-perl libio-socket-ssl-perl"
 
-
 send_email () {
 	sendemail -f $FROM -t $TO -u $SUBJ -s $SERVER -xu $FROM -xp "$PASSWORD" \
 	-m "$1" -v -o tls=yes message-charset=$CHARSET
@@ -25,6 +24,7 @@ send_email () {
 check_db () {
 	mysqlshow $1 | grep Database | grep -o $1
 }
+
 service_check () {
 	if systemctl is-active --quiet "$service_name.service" ; then
   		echo "$service_name running"
@@ -32,7 +32,6 @@ service_check () {
   		systemctl start "$service_name"
 	fi
 }
-
 
 deploy_wp_site() {
     cd $WWW_ROOT
@@ -62,14 +61,26 @@ deploy_wp_site() {
 sudo apt-get update
 sudo apt-get install -y $PACKAGES $PHP_MODULES
 
-# Configure Apache2
+
+# Configure Apache web server
+# Check if exist Apache conf tpl file locally. If not, download from repository
+if [ ! -f "./conf/000-default.conf" ]; then
+    mkdir -p ./conf
+    curl -o conf/000-default.conf.j2 https://raw.githubusercontent.com/yakovlevg/vizor_tz/task1/conf/000-default.conf.j2
+fi
 cp ./conf/000-default.conf.j2 /etc/apache2/sites-available/000-default.conf
 sed -i 's/Listen 80$/Listen 8080/g' /etc/apache2/ports.conf
 systemctl restart apache2
 
-# Configure Nginx
+# Configure Nginx as reverse proxy
+# Check if exist Nginx conf tpl file locally. If not, download from repository
+if [ ! -f "./conf/nginx-default.conf.j2" ]; then
+    mkdir -p ./conf
+    curl -o conf/nginx-default.conf.j2 https://raw.githubusercontent.com/yakovlevg/vizor_tz/task1/conf/nginx-default.conf.j2
+fi
 cp ./conf/nginx-default.conf.j2 /etc/nginx/sites-available/default
 systemctl restart nginx
+
 
 # Create USER and DATABASE for Wordpress
 if check_db "$DB_USER"; then
