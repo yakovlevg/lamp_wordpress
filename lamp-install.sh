@@ -19,7 +19,7 @@ PACKAGES="apache2 default-mysql-server php libapache2-mod-php php-mysql nginx cu
 
 send_email () {
 	sendemail -f $FROM -t $TO -u $SUBJ -s $SERVER -xu $FROM -xp "$PASSWORD" \
-	-m "$1" -v -o =yes message-charset=$CHARSET
+	-m "$1" -v -o tls=yes message-charset=$CHARSET
 }
 
 check_db () {
