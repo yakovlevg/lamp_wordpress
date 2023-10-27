@@ -14,7 +14,7 @@ WWW_ROOT="/var/www/html"
 echo "Mysql creds:\n Username: $DB_USER\n Password: $DB_PASSWORD \n"
 MESSAGE="Mysql creds:\n Username: $DB_USER\n Password: $DB_PASSWORD \n"
 PHP_MODULES="php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip"
-PACKAGES="apache2 default-mysql-server php libapache2-mod-php php-mysql nginx curl sendemail"
+PACKAGES="apache2 default-mysql-server php libapache2-mod-php php-mysql nginx curl sendemail libnet-ssleay-perl libio-socket-ssl-perl"
 
 
 send_email () {
@@ -122,8 +122,8 @@ fi
 printf "Wordpress has been deployed on $HOST.\nPlease visit http://$LOCAL_IP/wp-admin/ \n
         Username: $WP_USER\nPassword: $WP_PASSWORD\n"
 
-send_email "Wordpress has been deployed on $HOST.\nPlease visit http://$LOCAL_IP/wp-admin/ \n
-        Username: $WP_USER\nPassword: $WP_PASSWORD\n"
+send_email "Wordpress has been deployed on $HOST.\nPlease visit http://$LOCAL_IP/wp-admin/ \n \
+            Username: $WP_USER\nPassword: $WP_PASSWORD\n"
 
 
 
