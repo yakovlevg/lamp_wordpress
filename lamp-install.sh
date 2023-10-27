@@ -39,6 +39,10 @@ deploy_wp_site() {
     # Download the latest version of WordPress
     wp core download --allow-root --path=$1
     cd $WWW_ROOT/$1
+    if [ -f wp-config.php]
+       # Update Database password
+       wp config set DB_PASSWORD $DB_PASSWORD --allow-root
+    fi
     # Create a new wp-config.php file
     wp config create --dbname=$DB_USER --dbuser=$DB_USER --dbpass=$DB_PASSWORD --allow-root
     # Create the database based on wp-config.php
@@ -78,20 +82,11 @@ systemctl restart apache2
 cp ./conf/nginx-default.conf.j2 /etc/nginx/sites-available/default
 systemctl restart nginx
 
-exit 1
-
-
-# Check installed wordpress
-if [ -d "/var/www/html/wordpress" ]; then
-     echo "wordpress already installed";
-else
-	echo "Wordpress is not installed"
-	#exit 1
-fi
-
 # Create USER and DATABASE for Wordpress
 if check_db "$DB_USER"; then
 	echo "Database $DB_USER already exist"
+    echo "Update password for user ${DB_USER}"
+    mysql -uroot -p${rootpasswd} -e "ALTER USER ${DB_USER}@localhost IDENTIFIED BY '${DB_PASSWORD}';"
 else
 if [ -f /root/.my.cnf ]; then
 
@@ -125,9 +120,16 @@ fi
 
 ## Deploy Wordpress site
 
-deploy_wp_site "$DB_USER"
+# Check installed wordpress
+if [ -d "/var/www/html/wordpress" ]; then
+     echo "wordpress already installed";
+else
+	echo "Wordpress is not installed"
+    deploy_wp_site "$DB_USER"
+	#exit 1
+fi
 
-echo "Wordpress has been deployed on $HOST.\n Please visit http://$LOCAL_IP/wp-admin/ \n
+printf "Wordpress has been deployed on $HOST.\n Please visit http://$LOCAL_IP/wp-admin/ \n
       Username: $WP_USER\nPassword: $WP_PASSWORD"
 
 
