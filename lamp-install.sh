@@ -64,7 +64,7 @@ sudo apt-get install -y $PACKAGES $PHP_MODULES
 
 # Configure Apache web server
 # Check if exist Apache conf tpl file locally. If not, download from repository
-if [ ! -f "./conf/000-default.conf"]; then
+if [ ! -f "./conf/000-default.conf" ]; then
     mkdir -p ./conf
     curl -o conf/000-default.conf.j2 https://raw.githubusercontent.com/yakovlevg/vizor_tz/task1/conf/000-default.conf.j2
 fi
@@ -74,7 +74,7 @@ systemctl restart apache2
 
 # Configure Nginx as reverse proxy
 # Check if exist Nginx conf tpl file locally. If not, download from repository
-if [ ! -f "./conf/nginx-default.conf.j2"]; then
+if [ ! -f "./conf/nginx-default.conf.j2" ]; then
     mkdir -p ./conf
     curl -o conf/000-default.conf.j2 https://raw.githubusercontent.com/yakovlevg/vizor_tz/task1/conf/nginx-default.conf.j2
 fi
