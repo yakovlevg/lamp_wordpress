@@ -58,7 +58,6 @@ deploy_wp_site() {
 ##########################   Start deployment LAMP with Wordpress    #######################################
 ############################################################################################################
 
-if [ $? -eq 0 ]; then
 # Install dependency packges
 sudo apt-get update
 sudo apt-get install -y $PACKAGES $PHP_MODULES
@@ -120,11 +119,11 @@ else
 fi
 
 
-    printf "Wordpress has been deployed on $HOST.\n Please visit http://$LOCAL_IP/wp-admin/ \n
-            Username: $WP_USER\nPassword: $WP_PASSWORD"
-else
-    printf "Somthing wrong. Check script."
+printf "Wordpress has been deployed on $HOST.\nPlease visit http://$LOCAL_IP/wp-admin/ \n
+        Username: $WP_USER\nPassword: $WP_PASSWORD\n"
 
-fi
+send_email "Wordpress has been deployed on $HOST.\nPlease visit http://$LOCAL_IP/wp-admin/ \n
+        Username: $WP_USER\nPassword: $WP_PASSWORD\n"
+
 
 
