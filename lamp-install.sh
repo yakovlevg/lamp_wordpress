@@ -14,7 +14,7 @@ WWW_ROOT="/var/www/html"
 echo "Mysql creds:\n Username: $DB_USER\n Password: $DB_PASSWORD \n"
 MESSAGE="Mysql creds:\n Username: $DB_USER\n Password: $DB_PASSWORD \n"
 PHP_MODULES="php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip"
-PACKAGES="apache2 default-mysql-server php libapache2-mod-php php-mysql nginx curl"
+PACKAGES="apache2 default-mysql-server php libapache2-mod-php php-mysql nginx curl sendemail"
 
 
 send_email () {
