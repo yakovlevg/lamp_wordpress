@@ -5,8 +5,8 @@
   vars:
     php_modules: [ 'php-curl', 'php-gd', 'php-mbstring', 'php-xml', 'php-xmlrpc', 'php-soap', 'php-intl', 'php-zip' ]
   vars_files:
-    - all.yaml
-    - vars.yaml
+    - "./group_vars/all.yaml"
+    - "./group_vars/vars.yaml"
 
   tasks:
     - name: Install prerequisites
