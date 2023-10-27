@@ -113,7 +113,7 @@
 
     - name: Install WordPress tables
       command: wp core install
-                --url="{{ wp_home_url }}"
+                --url="{{ ansible_all_ipv4_addresses }}"
                 --title="{{ wp_site_title }}"
                 --admin_user="{{ wp_admin_user }}"
                 --admin_password="{{ wp_admin_pwd }}"
