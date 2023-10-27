@@ -16,7 +16,7 @@
 
     - name: Install LAMP Packages
       apt: name={{ item }} update_cache=yes state=latest
-      loop: [ 'apache2', 'python3-pymysql', 'php', 'php-mysql', 'libapache2-mod-php', 'sendemail', 'libnet-ssleay-perl', 'libio-socket-ssl-perl', 'default-mysql-server', 'default-mysql-client' ]
+      loop: [ 'apache2', 'python3-pymysql', 'php', 'php-mysql', 'libapache2-mod-php', 'sendemail', 'libnet-ssleay-perl', 'libio-socket-ssl-perl', 'default-mysql-server', 'default-mysql-client', 'nginx' ]
       tags: [ system ]
 
     - name: Install PHP Extensions
