@@ -39,7 +39,7 @@ deploy_wp_site() {
     # Download the latest version of WordPress
     wp core download --allow-root --path=$1
     cd $WWW_ROOT/$1
-    if [ -f wp-config.php]
+    if [ -f "wp-config.php" ]; then
        # Update Database password
        wp config set DB_PASSWORD $DB_PASSWORD --allow-root
     fi
