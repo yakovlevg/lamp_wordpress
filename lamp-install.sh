@@ -119,11 +119,11 @@ else
 fi
 
 
-printf "Wordpress has been deployed on $HOST.\nPlease visit http://$LOCAL_IP/wp-admin/ \n
-        Username: $WP_USER\nPassword: $WP_PASSWORD\n"
+printf "Wordpress has been deployed on $HOST.\nPlease visit http://$LOCAL_IP/wp-admin/\n\
+    Username: $WP_USER\n    Password: $WP_PASSWORD\n"
 
-send_email "Wordpress has been deployed on $HOST.\nPlease visit http://$LOCAL_IP/wp-admin/ \n \
-            Username: $WP_USER\nPassword: $WP_PASSWORD\n"
+send_email "Wordpress has been deployed on $HOST.\nPlease visit http://$LOCAL_IP/wp-admin/\n\
+    Username: $WP_USER\n    Password: $WP_PASSWORD\n"
 
 
 
