@@ -1,0 +1,137 @@
+---
+- hosts: all
+  become: true
+  vars:
+    php_modules: [ 'php-curl', 'php-gd', 'php-mbstring', 'php-xml', 'php-xmlrpc', 'php-soap', 'php-intl', 'php-zip' ]
+  vars_files:
+    - all.yaml
+    - vars.yaml
+
+  tasks:
+    - name: Install prerequisites
+      apt: name=aptitude update_cache=yes state=latest force_apt_get=yes
+      tags: [ system ]
+
+    - name: Install LAMP Packages
+      apt: name={{ item }} update_cache=yes state=latest
+      loop: [ 'apache2', 'python3-pymysql', 'php', 'php-mysql', 'libapache2-mod-php', 'endemail', 'libnet-ssleay-perl', 'libio-socket-ssl-perl', 'default-mysql-server', 'default-mysql-client' ]
+      tags: [ system ]
+
+    - name: Install PHP Extensions
+      apt: name={{ item }} update_cache=yes state=latest
+      loop: "{{ php_modules }}"
+      tags: [ system ]
+
+  
+  # WordPress Configuration
+    - name: Create WordPress database
+      mysql_db: name="{{ db_name }}"
+                state=present
+                login_user=root
+                login_password="{{ mysql_root_password }}"
+
+    - name: Create WordPress DB user and grant permissions to WordPress DB
+      mysql_user: name="{{ db_user }}"
+                  password="{{ db_pwd }}"
+                  priv="{{ db_name }}.*:ALL"
+                  state=present
+                  login_user="root"
+                  login_password="{{ mysql_root_password }}"
+
+    - name: Is WordPress downloaded?
+      stat: path="/var/www/{{ domain_name }}/html/index.php"
+      register: wp_dir
+
+    - name: Download WordPress
+      command: wp core download
+      args:
+          chdir: "/var/www/html/{{ domain_name }}/"
+      remote_user: "{{ web_user }}"
+      when: wp_dir.stat.isdir is not defined
+
+    - name: Configure WordPress
+      command: wp core config
+              --path="/var/www/html/{{ domain_name }}/"
+              --dbname="{{ db_name }}"
+              --dbuser="{{ db_user }}"
+              --dbpass="{{ db_pwd }}"
+              --dbprefix="{{ db_prefix }}"
+      remote_user: "{{ web_user }}"
+      when: wp_dir.stat.isdir is not defined
+
+    - name: Is WordPress installed?
+      command: wp core is-installed
+      args:
+        chdir: "/var/www/html/{{ domain_name }}/"
+      register: wordpress_is_installed
+      ignore_errors: True
+      remote_user: "{{ web_user }}"
+
+    - name: Install WordPress tables
+      command: wp core install
+                --url="{{ wp_home_url }}"
+                --title="{{ wp_site_title }}"
+                --admin_user="{{ wp_admin_user }}"
+                --admin_password="{{ wp_admin_pwd }}"
+                --admin_email="{{ wp_admin_email }}"
+      args:
+          chdir: "/var/www/html/{{ domain_name }}/"
+      when: wordpress_is_installed|failed
+      remote_user: "{{ web_user }}"
+
+
+    - name: Set up wp-config
+      template:
+        src: "files/wp-config.php.j2"
+        dest: "/var/www/html/wordpress/wp-config.php"
+      tags: [ wordpress ]
+
+    - name: Set up apache conf
+      template:
+        src: "files/000-default.conf.j2"
+        dest: "/etc/apache2/sites-available/000-default.conf"
+      tags: [ wordpress ]
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted
+    - name: Set up nginx conf
+      template:
+        src: "files/nginx-default.conf.j2"
+        dest: "/etc/nginx/sites-available/default"
+      tags: [ wordpress ]
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+
+  handlers:
+    - name: Reload Apache
+      service:
+        name: apache2
+        state: reloaded
+
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted
+    - name: Reload Nginx
+      service:
+        name: nginx
+        state: reloaded
+
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+
+- name: Sending an e-mail using Gmail SMTP servers
+  community.general.mail:
+    host: smtp.gmail.com
+    port: 587
+    username: {{ smtp_username}}
+    password: {{ smtp_pwd }}
+    to: Site Admin <gendos2002@gmail.com>
+    subject: Ansible-report
+    body: System {{ ansible_hostname }} has been successfully provisioned.
+  delegate_to: localhost
