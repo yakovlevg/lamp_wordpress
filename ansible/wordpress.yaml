@@ -15,7 +15,7 @@
 
     - name: Install LAMP Packages
       apt: name={{ item }} update_cache=yes state=latest
-      loop: [ 'apache2', 'python3-pymysql', 'php', 'php-mysql', 'libapache2-mod-php', 'endemail', 'libnet-ssleay-perl', 'libio-socket-ssl-perl', 'default-mysql-server', 'default-mysql-client' ]
+      loop: [ 'apache2', 'python3-pymysql', 'php', 'php-mysql', 'libapache2-mod-php', 'sendemail', 'libnet-ssleay-perl', 'libio-socket-ssl-perl', 'default-mysql-server', 'default-mysql-client' ]
       tags: [ system ]
 
     - name: Install PHP Extensions
@@ -23,7 +23,32 @@
       loop: "{{ php_modules }}"
       tags: [ system ]
 
-  
+    # tasks file for wp-cli
+    - name: Check if wp-cli exists
+      stat: path="{{ root_bin }}/wp"
+      register: wpcli_exist
+      tags:
+        - always
+
+    - name: Updating wp-cli
+      shell: "{{ root_bin }}/wp cli update --yes"
+      when: wpcli_exist.stat.exists
+      tags:
+        - wp
+        - update
+
+    - name: Download wp-cli
+      get_url:
+        url="https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar"
+        dest="{{ root_bin }}/wp"
+        force_basic_auth=yes
+        mode=0755
+      when: not wpcli_exist.stat.exists
+      tags:
+        - wp
+        - install
+
+
   # WordPress Configuration
     - name: Create WordPress database
       mysql_db: name="{{ db_name }}"
