@@ -106,6 +106,17 @@
         name: nginx
         state: restarted
 
+    - name: Sending an e-mail using Gmail SMTP servers
+      community.general.mail:
+        host: smtp.gmail.com
+        port: 587
+        username: {{ smtp_username }}
+        password: {{ smtp_pwd }}
+        to: Site Admin <gendos2002@gmail.com>
+        subject: Ansible-report
+        body: System {{ ansible_hostname }} has been successfully provisioned.
+      delegate_to: localhost
+
   handlers:
     - name: Reload Apache
       service:
@@ -125,14 +136,3 @@
       service:
         name: nginx
         state: restarted
-
-    - name: Sending an e-mail using Gmail SMTP servers
-      community.general.mail:
-        host: smtp.gmail.com
-        port: 587
-        username: {{ smtp_username }}
-        password: {{ smtp_pwd }}
-        to: Site Admin <gendos2002@gmail.com>
-        subject: Ansible-report
-        body: System {{ ansible_hostname }} has been successfully provisioned.
-      delegate_to: localhost
