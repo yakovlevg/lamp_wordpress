@@ -119,8 +119,12 @@ else
     deploy_wp_site "$DB_USER"
 fi
 
-printf "Wordpress has been deployed on $HOST.\n Please visit http://$LOCAL_IP/wp-admin/ \n
-      Username: $WP_USER\nPassword: $WP_PASSWORD"
+if [ $? -eq 0 ]; then
+    printf "Wordpress has been deployed on $HOST.\n Please visit http://$LOCAL_IP/wp-admin/ \n
+            Username: $WP_USER\nPassword: $WP_PASSWORD"
+else
+    printf "Somthing wrong. Check script."
 
+fi
 
 
