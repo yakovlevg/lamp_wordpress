@@ -76,7 +76,7 @@ systemctl restart apache2
 # Check if exist Nginx conf tpl file locally. If not, download from repository
 if [ ! -f "./conf/nginx-default.conf.j2" ]; then
     mkdir -p ./conf
-    curl -o conf/000-default.conf.j2 https://raw.githubusercontent.com/yakovlevg/vizor_tz/task1/conf/nginx-default.conf.j2
+    curl -o conf/nginx-default.conf.j2 https://raw.githubusercontent.com/yakovlevg/vizor_tz/task1/conf/nginx-default.conf.j2
 fi
 cp ./conf/nginx-default.conf.j2 /etc/nginx/sites-available/default
 systemctl restart nginx
