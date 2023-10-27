@@ -85,7 +85,7 @@
       tags: [ wordpress ]
 
     - name: Download WordPress
-      command: wp core download
+      command: wp core download --allow-root
       args:
           chdir: "/var/www/html/{{ domain_name }}/"
       remote_user: "{{ web_user }}"
