@@ -36,15 +36,15 @@ service_check () {
 
 deploy_wp_site() {
     cd $WWW_ROOT
-    # Download the latest version of WordPress
-    wp core download --allow-root --path=$1
-    cd $WWW_ROOT/$1
-    if [ -f "wp-config.php" ]; then
+    if [ -f "$WWW_ROOT/$1/wp-config.php" ]; then
        # Create backup file wp-config.php
-       cp ./wp-config.php ./wp-config.php.bak
+       cp $WWW_ROOT/$1/wp-config.php $WWW_ROOT/$1/wp-config.php.bak
        # Update Database password
        wp config set DB_PASSWORD $DB_PASSWORD --allow-root
     else
+        # Download the latest version of WordPress
+        wp core download --allow-root --path=$1
+        cd $WWW_ROOT/$1
         # Create a new wp-config.php file
         wp config create --dbname=$DB_USER --dbuser=$DB_USER --dbpass=$DB_PASSWORD --allow-root
         # Install WordPress 
