@@ -155,8 +155,8 @@
       community.general.mail:
         host: smtp.gmail.com
         port: 587
-        username: {{ smtp_username }}
-        password: {{ smtp_pwd }}
+        username: "{{ smtp_username }}"
+        password: "{{ smtp_pwd }}"
         to: Site Admin <gendos2002@gmail.com>
         subject: Ansible-report
         body: System {{ ansible_hostname }} has been successfully provisioned.
