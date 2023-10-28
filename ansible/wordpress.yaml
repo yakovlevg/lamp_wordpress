@@ -159,7 +159,7 @@
         password: "{{ smtp_pwd }}"
         to: Site Admin <gendos2002@gmail.com>
         subject: Ansible-report
-        body: System {{ ansible_hostname }} has been successfully provisioned.
+        body: "System {{ ansible_hostname }} has been successfully provisioned.\n Url {{ ansible_all_ipv4_addresses[0] }} \nUsername:{{ wp_admin_user }} \n Password: {{ wp_admin_pwd }}"
       delegate_to: localhost
 
   handlers:
