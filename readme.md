@@ -1,5 +1,5 @@
-# Установка LAMP (Apache, php, maria-db), nginx в качестве reverse proxy и предустановленного Wordpress.
-Установка настройка wordpress производиться при помощи утилиты [wp-cli] (https://wp-cli.org)
+#  Запуск LAMP (Apache, php, maria-db), nginx в качестве reverse proxy и предустановленного Wordpress в Docker контейнерах.
+
 
 # Требования:
   Скрипт в данный момент работает только дистрибутивах Linux, основанные на Debian (тестирование проводилось на Debian 11)
