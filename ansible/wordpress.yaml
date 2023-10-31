@@ -1,0 +1,182 @@
+---
+- hosts: localhost
+  connection: local
+  become: true
+  vars:
+    php_modules: [ 'php-curl', 'php-gd', 'php-mbstring', 'php-xml', 'php-xmlrpc', 'php-soap', 'php-intl', 'php-zip' ]
+  vars_files:
+    - "./group_vars/all.yaml"
+    - "./group_vars/vars.yaml"
+
+  tasks:
+
+    - name: Install prerequisites
+      apt: name=aptitude update_cache=yes state=latest force_apt_get=yes
+      tags: [ system ]
+
+    - name: Install LAMP Packages
+      apt: name={{ item }} update_cache=yes state=latest
+      loop: [ 'apache2', 'python3-pymysql', 'php', 'php-mysql', 'libapache2-mod-php', 'sendemail', 'libnet-ssleay-perl', 'libio-socket-ssl-perl', 'default-mysql-server', 'default-mysql-client', 'nginx' ]
+      tags: [ system ]
+
+    - name: Install PHP Extensions
+      apt: name={{ item }} update_cache=yes state=latest
+      loop: "{{ php_modules }}"
+      tags: [ system ]
+
+    # tasks file for wp-cli
+    - name: Check if wp-cli exists
+      stat: path="{{ root_bin }}/wp"
+      register: wpcli_exist
+      tags:
+        - always
+
+    - name: Updating wp-cli
+      shell: "{{ root_bin }}/wp cli update --yes"
+      when: wpcli_exist.stat.exists
+      tags:
+        - wp
+        - update
+
+    - name: Download wp-cli
+      get_url:
+        url="https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar"
+        dest="{{ root_bin }}/wp"
+        force_basic_auth=yes
+        mode=0755
+      when: not wpcli_exist.stat.exists
+      tags:
+        - wp
+        - install
+
+
+  # WordPress Configuration
+    - name: Create WordPress database
+      mysql_db: name="{{ db_name }}"
+                login_unix_socket="/var/run/mysqld/mysqld.sock"
+                state=present
+                login_user=root
+                login_password="{{ mysql_root_password }}"
+    - debug: 
+        msg: "Создание БД  {{ db_name }} завершено."
+
+    - name: Create WordPress DB user and grant permissions to WordPress DB
+      mysql_user: name="{{ db_user }}"
+                  password="{{ db_pwd }}"
+                  priv="{{ db_name }}.*:ALL"
+                  state=present
+                  login_user="root"
+                  login_password="{{ mysql_root_password }}"
+                  login_unix_socket="/var/run/mysqld/mysqld.sock"
+
+    - name: Is WordPress downloaded?
+      stat: path="/var/www/html/{{ domain_name }}/index.php"
+      register: wp_dir
+
+    - name: Creates directory
+      file:
+        path: "/var/www/html/{{ domain_name }}"
+        state: directory
+
+    - name: Set ownership
+      file:
+        path: "/var/www/html/"
+        state: directory
+        recurse: yes
+        owner: www-data
+        group: www-data
+      tags: [ wordpress ]
+
+    - name: Download WordPress
+      command: wp core download --allow-root
+      args:
+          chdir: "/var/www/html/{{ domain_name }}/"
+      remote_user: "{{ web_user }}"
+      when: wp_dir.stat.isdir is not defined
+    - debug:
+        msg: "Загрузка завершена."
+
+    - name: Configure WordPress
+      command: wp core config
+              --path="/var/www/html/{{ domain_name }}/"
+              --dbname="{{ db_name }}"
+              --dbuser="{{ db_user }}"
+              --dbpass="{{ db_pwd }}"
+              --dbprefix="{{ db_prefix }}"
+              --allow-root
+      remote_user: "{{ web_user }}"
+      when: wp_dir.stat.isdir is not defined
+    - debug:
+        msg: "Конфигурирование сайта завершено."      
+
+    - name: Install WordPress tables
+      command: wp core install
+                --url="{{ ansible_all_ipv4_addresses[0] }}"
+                --title="{{ wp_site_title }}"
+                --admin_user="{{ wp_admin_user }}"
+                --admin_password="{{ wp_admin_pwd }}"
+                --admin_email="{{ wp_admin_email }}"
+                --allow-root
+      args:
+          chdir: "/var/www/html/{{ domain_name }}/"
+      remote_user: "{{ web_user }}"
+    - debug:
+        msg: "Установка сайта завершено. Url:http://{{ ansible_all_ipv4_addresses[0] }}\n Username:{{ wp_admin_user }}, Password: {{ wp_admin_pwd }}"      
+
+    - name: replace line
+      lineinfile: 
+        path: /etc/apache2/ports.conf
+        regexp: '^Listen 80$' 
+        line: 'Listen 8080'
+        backrefs: yes
+
+
+    - name: Set up apache conf
+      template:
+        src: "files/000-default.conf.j2"
+        dest: "/etc/apache2/sites-available/000-default.conf"
+      tags: [ wordpress ]
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted
+    - name: Set up nginx conf
+      template:
+        src: "files/nginx-default.conf.j2"
+        dest: "/etc/nginx/sites-available/default"
+      tags: [ wordpress ]
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+
+    - name: Sending an e-mail using Gmail SMTP servers
+      community.general.mail:
+        host: smtp.gmail.com
+        port: 587
+        username: "{{ smtp_username }}"
+        password: "{{ smtp_pwd }}"
+        to: Site Admin <gendos2002@gmail.com>
+        subject: Ansible-report
+        body: "System {{ ansible_hostname }} has been successfully provisioned.\nUrl http://{{ ansible_all_ipv4_addresses[0] }}/wp-admin\nUsername:{{ wp_admin_user }}\nPassword: {{ wp_admin_pwd }}"
+      delegate_to: localhost
+
+  handlers:
+    - name: Reload Apache
+      service:
+        name: apache2
+        state: reloaded
+
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted
+    - name: Reload Nginx
+      service:
+        name: nginx
+        state: reloaded
+
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted

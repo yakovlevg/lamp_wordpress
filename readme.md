@@ -2,7 +2,13 @@
 Установка настройка wordpress производиться при помощи утилиты [wp-cli] (https://wp-cli.org)
 
 # Требования:
-  Скрипт в данный момент работает только дистрибутивах Linux, основанные на Debian (тестирование проводилось на Debian 11)
+  Данная установка производиться локально. На сервере должен быть установлен ansible
+  ```
+  apt-get update
+  apt-get install python3 python3-pip
+  pip install ansible
+
+  ```
 
 # Установка
 
@@ -10,43 +16,41 @@
 ```
     git clone https://github.com/yakovlevg/vizor_tz.git
     cd vizor_tz/
-    git checkout task1
+    git checkout task2
 
 ```
 
-2. Создайте файл .env в данной директории следующего содержания:
+2. Отредактируйте файл 'ansible/group_vars/vars.yaml`  следующего содержания:
 
 ```
-SERVER="smtp.example.com"
-FROM="sender@example.com"
-TO="reciever@example.com"
-SUBJ="Wordpress install"
-CHARSET="utf-8"
-PASSWORD="smtp_password"
+mysql_root_password: "mysql root password"
+db_user: wordpress
+db_pwd: "db wordpress user password"
+web_user: "www-data"
+wp_admin_user: "admin"
+wp_admin_pwd: "dfe$$vvf"
+wp_admin_email: "wp_admin_email"
+smtp_username: "smtp username"
+smtp_pwd: "smtp password"
+
+
 ```
 3. Запустите скрипт:
 
 ```
-bash lamp-install.sh
+ansible-playbook ansible/wordpress.yaml
 
-или 
+или
 
-chmod +x lamp-install.sh && ./lamp-install.sh
+chmod +x deploy-wordpress.sh && ./deploy-wordpress.sh
 
 ```
 4. Дождитесь окончания установки. Учетные данные будут доступны после выполнения скрипта и отправлены по почте
 
-## Или можно запустить скрипт непосредственно с гит репозитория, предварительно выполнив п.2 в директории, откуда будет выполняться скрипт.
 
-```
-wget -O - https://raw.githubusercontent.com/yakovlevg/vizor_tz/feature/task1/lamp-install.sh | bash
-
-```
-### Важно
-Пароли для базы данных и админ панели меняются при каждом запуске скрипта!
 
 ### ToDo
- - запуск скрипта на любом Linux дистрибутиве
+ - запуск playbook на любом Linux дистрибутиве
  - Отправка уведомления об ошибке выполнения скрипта на любом из этапов установки.
 
 
