@@ -1,3 +1,5 @@
 .env
 *.txt
 *.log
+db/
+files/
