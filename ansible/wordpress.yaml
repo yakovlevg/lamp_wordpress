@@ -57,6 +57,8 @@
                 state=present
                 login_user=root
                 login_password="{{ mysql_root_password }}"
+    - debug: 
+        msg: "Создание БД  {{ db_name }} завершено."
 
     - name: Create WordPress DB user and grant permissions to WordPress DB
       mysql_user: name="{{ db_user }}"
@@ -91,6 +93,8 @@
           chdir: "/var/www/html/{{ domain_name }}/"
       remote_user: "{{ web_user }}"
       when: wp_dir.stat.isdir is not defined
+    - debug:
+        msg: "Загрузка завершена."
 
     - name: Configure WordPress
       command: wp core config
@@ -102,14 +106,8 @@
               --allow-root
       remote_user: "{{ web_user }}"
       when: wp_dir.stat.isdir is not defined
-
-    # - name: Is WordPress installed?
-    #   command: wp core is-installed --allow-root
-    #   args:
-    #     chdir: "/var/www/html/{{ domain_name }}/"
-    #   register: wordpress_is_installed
-    #   ignore_errors: True
-    #   remote_user: "{{ web_user }}"
+    - debug:
+        msg: "Конфигурирование сайта завершено."      
 
     - name: Install WordPress tables
       command: wp core install
@@ -121,8 +119,9 @@
                 --allow-root
       args:
           chdir: "/var/www/html/{{ domain_name }}/"
-#      when: wordpress_is_installed|failed
       remote_user: "{{ web_user }}"
+    - debug:
+        msg: "Установка сайта завершено. Url:http://{{ ansible_all_ipv4_addresses[0] }}\n Username:{{ wp_admin_user }}, Password: {{ wp_admin_pwd }}"      
 
     - name: replace line
       lineinfile: 
