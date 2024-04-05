@@ -8,8 +8,8 @@
 
 1. Клонируйте репозиторий на сервер, где будет производиться установка Wordpress
 ```
-    git clone https://github.com/yakovlevg/vizor_tz.git
-    cd vizor_tz/
+    git clone https://github.com/yakovlevg/lamp_wordpress.git
+    cd lamp_wordpress/
     git checkout task3
     docker-compose up
 
