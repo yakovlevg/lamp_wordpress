@@ -8,7 +8,7 @@
 
 1. Клонируйте репозиторий на сервер, где будет производиться установка Wordpress
 ```
-    git clone https://github.com/yakovlevg/vizor_tz.git
+    git clone https://github.com/yakovlevg/lamp_wordpress.git
     cd vizor_tz/
     git checkout task1
 
@@ -39,7 +39,7 @@ chmod +x lamp-install.sh && ./lamp-install.sh
 ## Или можно запустить скрипт непосредственно с гит репозитория, предварительно выполнив п.2 в директории, откуда будет выполняться скрипт.
 
 ```
-wget -O - https://raw.githubusercontent.com/yakovlevg/vizor_tz/feature/task1/lamp-install.sh | bash
+wget -O - https://raw.githubusercontent.com/yakovlevg/lamp_wordpress/feature/task1/lamp-install.sh | bash
 
 ```
 ### Важно
