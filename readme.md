@@ -14,7 +14,7 @@
 
 1. Клонируйте репозиторий на сервер, где будет производиться установка Wordpress
 ```
-    git clone https://github.com/yakovlevg/vizor_tz.git
+    git clone https://github.com/yakovlevg/lamp_wordpress.git
     cd vizor_tz/
     git checkout task2
 
